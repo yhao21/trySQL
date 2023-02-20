@@ -1,0 +1,48 @@
+###------Installation------###
+
+		##------Install------##
+				'''
+				sudo apt update && sudo apt upgrade && sudo apt install mysql-server && mysql --version
+				'''
+
+		##------change the root user’s authentication method to one that uses a password------##
+				'''
+				sudo mysql
+				ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'my_password';
+				'''
+
+
+				Following that, you can run the mysql_secure_installation script without issue.
+
+				'''
+				sudo mysql_secure_installation
+				'''
+
+		##------install python client------##
+				sudo python3.8 -m pip install mysqlclient mysql-connector-python
+
+
+		###------Download WorkBench(where you write SQL)------###
+				https://downloads.mysql.com/archives/workbench/
+				Note: if you are using Ubuntu 20.04, choose version 8.0.29. 
+
+				'''
+				sudo gdebi mysql-workbench-community_8.0.29-1ubuntu20.04_amd64.deb
+				'''
+
+
+
+
+
+###------Connect to server------###
+		mysql -u root -p
+		exit
+
+
+
+###------If mysql is not working------###
+
+		If MySQL isn’t running, you can start it with 
+		'''
+		sudo systemctl start mysql
+		'''
