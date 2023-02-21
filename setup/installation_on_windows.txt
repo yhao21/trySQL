@@ -1,0 +1,50 @@
+
+After installation, add the following to env varialbe "path",
+		C:\Program Files\MySQL\MySQL Server 8.0\bin.
+
+
+Then you can use 
+		mysql -u root -p
+in powershell.
+
+
+
+###------------###
+Change datadir
+
+		mysql -u root -p
+
+		show variables like '%dir%'
+				Variable 'datadir' will tell you the path (C:\ProgramData\MySQL\MySQL Server 8.0\Data\)
+		Note your my.ini is also here!!!
+
+
+		win+R then 
+				services.msc
+		Switch to "Standard" tag!!!!  Then find your server name, e.g., synferlo_myPC
+		Right click, and top it.
+
+		Copy 
+				C:\ProgramData\MySQL\MySQL Server 8.0\Data\
+		to your new disk, e.g., 
+				Z:\mysql
+
+
+		Then, modify my.ini under C:\ProgramData\MySQL\MySQL Server 8.0\
+				Right click on my.ini, properties, security, Edit, 
+				Choose Users then click on Full control.
+
+				Open my.ini, change datadir under [mysqld]
+						datadir=Z:\mysql\Data
+				save
+
+		Then go back to services.msc, press F5 to refresh, then find synferlo_myPC,
+		right click and start service.
+
+		Open Workbench, click on server status, you can see that Data Directory is not
+				Z:\mysql\Data\
+
+
+		
+
+
