@@ -1,0 +1,2 @@
+sudo nvim /etc/mysql/mysql.conf.d/mysqld.cnf
+change <datadir. to new path

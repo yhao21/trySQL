@@ -1,0 +1,39 @@
+###------secure_file_priv------###
+If you cannot use 
+		'''
+		load data infile ...
+		'''
+to load csv, type this in your terminal:
+		'''
+		show variables like 'secure_file_priv'
+		'''
+
+It will return a result like this:
+
+('secure_file_priv', '/var/lib/mysql-files/')
+
+
+Two way to solve this:
+##------Method 1: Disable secure-file-priv variable------##
+		sudo nvim /etc/mysql/my.cnf
+				[mysqld]
+				secure_file_priv = ""
+
+		#sudo systemctl restart mysqld
+		sudo service mysql restart
+
+		Check again 
+
+		show variables like 'secure_file_priv'
+
+		It should be look like this
+		+------------------+-------+
+		| Variable_name    | Value |
+		+------------------+-------+
+		| secure_file_priv |       |
+		+------------------+-------+
+		1 row in set (0.00 sec)
+
+
+
+		NOTE: DO NOT omit [mysqld]!!!!!
