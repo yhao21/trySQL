@@ -1,45 +1,46 @@
-from sqlalchemy import create_engine
 import pandas as pd
 import mysql.connector as cn
+from sqlalchemy import create_engine
 import json
 
 
-with open('/home/synferlo/mySQL/local_info.json', 'r') as f:
+
+def load_to_sql(df, host, user, password, database, table_name):
+    engine = create_engine('mysql+pymysql://{my_user}:{my_pw}@{my_host}/{my_db}'
+            .format(my_user = user, my_pw = password, my_host = host, my_db = database))
+    df.to_sql(table_name, engine, index = False, if_exists = 'replace')
+
+
+with open('/home/synferlo/mySQL/mydesktop_info.json', 'r') as f:
     info = json.load(f)
 
-link = cn.connect(
-        user = info['user'],
-        password = info['password'],
-        host = info['host'],
-        database = 'eth_on_chain'
-        )
+host, user, password, database = info['host'], info['user'], info['password'], 'airbnb'
 
+df = pd.read_csv('/home/synferlo/my_disk/git/data/sample_dataset/airbnb_NYC_2019.csv')
+room_info = df[['id','name', 'host_id', 'room_type', 'price', 'minimum_nights', 'availability_365']]
+room_location = df[['id', 'neighbourhood_group', 'neighbourhood', 'latitude', 'longitude']]
+room_host = df[['host_id', 'host_name', 'calculated_host_listings_count']]
+room_review = df[['id', 'number_of_reviews', 'last_review', 'reviews_per_month']]
 
-
-df = pd.read_csv('/home/synferlo/my_disk/git/data/sample_dataset/sample_eth_blocks_tx.csv')
-time_format = '%Y-%m-%d %H:%M:%S'
-df['block_time'] = pd.to_datetime(df['block_time'], format = time_format)
-df['tx_value'] = df['tx_value'].astype(float)
-df1 = df.head(2000)
-print(df1)
-
-
-with open('/home/synferlo/mySQL/local_info.json', 'r') as f:
-    data = json.load(f)
-host = data['host']
-database = 'eth_on_chain'
-user = data['user']
-password = data['password']
-
-engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}"
-				.format(host=host, db=database, user=user, pw=password))
-
-# Convert dataframe to sql table                                   
-# if_exists: 'append', 'replace'
-df.to_sql('tx_info', engine, index=False, if_exists = 'append')
-
-
-
-
-
-
+load_to_sql(room_info, host, user, password, database, 'room_info')
+load_to_sql(room_location, host, user, password, database, 'room_location')
+load_to_sql(room_host, host, user, password, database, 'room_host')
+load_to_sql(room_review, host, user, password, database, 'room_review')
+'''
+id x
+name x
+host_id x
+host_name x
+neighbourhood_group x
+neighbourhood x
+latitude x
+longitude x
+room_type x
+price x
+minimum_nights x
+number_of_reviews
+last_review
+reviews_per_month
+calculated_host_listings_count x
+availability_365 x
+'''

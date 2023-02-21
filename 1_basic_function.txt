@@ -1,0 +1,148 @@
+###------Describe table------###
+
+		desc <table name>
+
+		It will return column name, type of data, etc.
+
+
+###------Set default value when creating new table------###
+		
+		===
+		create table students
+		(
+		`name` varchar(100),
+		`age` int default 20
+		);
+		
+		
+		
+		insert into students (`name`) values('alex');
+		select * from students
+		===
+
+
+		In this case, I set the default of age to be 20.
+
+
+
+###------Return unique value of a column------###
+		select distinct <column name> from <table name>
+
+		select distinct room_type from room_info
+
+
+===================================
+###------Table action------###
+===================================
+##------Modify data type of a columns------##
+		alter table <table name>
+		modify <column name> <data type>
+
+##------Rename a column------##
+		alter table <table name>
+		rename column <old_name> to <new_name>
+
+
+##------Add a column------##
+		alter table students
+		add column <column name> <data type>;	
+
+##------Drop a column------##
+		alter table students
+		drop column <column name>
+
+
+
+##------Set primary key when creating a table------##
+		create table student(
+		`CUID` int,
+		`name` varchar(100),
+		`age` int,
+		primary key (`CUID`)
+		);
+
+
+##------Drop an existed primary key------##
+		alter table student
+		drop primary key;
+
+
+##------Add primary key to an existed table------##
+		alter table student
+		add primary key(CUID)
+
+
+
+
+
+
+
+===================================
+###------Search action------###
+===================================
+##------Only show the first n rows------##
+		Same as df.head(n)
+
+		'''
+		select * from room_info
+		limit 5
+		'''
+
+		This will only return the first 5
+
+##------Min()------##
+		select min(<column name>) from <table name>
+
+
+
+
+##------Max()------##
+		select max(<column name>) from <table name>
+
+
+##------Like (blury search)------##
+		select * from room_info
+		where room_type like <condition>
+
+		LIKE 'a%'	Finds any values that start with "a"
+		LIKE '%a'	Finds any values that end with "a"
+		LIKE '%or%'	Finds any values that have "or" in any position
+		LIKE '_r%'	Finds any values that have "r" in the second position
+		LIKE 'a_%'	Finds any values that start with "a" and are at least 2 characters in length
+		LIKE 'a__%'	Finds any values that start with "a" and are at least 3 characters in length
+		LIKE 'a%o'	Finds any values that start with "a" and ends with "o"
+
+
+##------In------##
+		Similar to python. Very Useful!!!
+
+		select * from room_info
+		where price in (100, 40)
+
+
+		price can be either 100 or 40.
+
+
+		=========begin========= 
+		Advanced operation: 
+				Show information in table <room_info> for those hosts who
+				has more than 3 listing items
+
+				'''
+				select `name`, room_type, price, host_id from room_info
+				where host_id in (
+					select host_id from room_host
+					where calculated_host_listings_count > 3
+					)
+				'''
+		=========end========= 
+		
+		
+		
+		
+
+
+
+
+
+
