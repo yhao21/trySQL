@@ -67,10 +67,136 @@
 		drop primary key;
 
 
-##------Add primary key to an existed table------##
-		alter table student
-		add primary key(CUID)
+##------Add primary key and foreign key to an existed table------##
+		alter table room_info
+		add primary key(id);
 
+		alter table room_info
+		add foreign key(host_id) references room_host(host_id);
+
+
+
+
+
+===================================
+###------Merge table------###
+===================================
+##------Inner join------##
+		Show intersection between two tables.
+
+		select <columns from different tables>
+		from <table 1>
+		inner join <table 2> on <table1.host_id> = <table2.host_id>
+
+
+		Example:
+
+		Suppose I want to include the host_id, from room_host,
+
+		'''
+		select `name` as 'item name',
+		room_type, price, room_host.host_id
+		from room_info
+		inner join room_host on room_info.host_id = room_host.host_id
+		'''
+
+
+
+##------Right join------##
+		Two tables: room_info, a.
+				room_info: 	inclues name of item, prices, ...
+				a: 					host_id, host_name, num_of_listings
+		Note, only for those who have more than 100 listed items are included in table <a>.
+
+
+		Target: Show name and price for each item posted by host in table a (Those who have more than 100 listed items).
+
+		Logic: 
+				1. need to extract a from room_host.
+				2. info in room_info that will be extracted rely on host in table a. In another word, this can be a <right join>.
+
+
+		Code:
+				-- construct table a
+				with a as
+					(
+				    select * from room_host
+					where calculated_host_listings_count > 100
+				    )
+				
+				-- right join room_info on table a
+				select `name`, a.host_name
+				from room_info
+				right join a on room_info.host_id = a.host_id
+
+
+
+
+		Appendix:
+		Table a
+
+				host_id,	host_name,	calculated_host_listings_count
+				30283594,		Kara,									121
+				107434423,	Blueground,						232
+				137358866,	Kazuya,								103
+				219517861,	"Sonder (NYC)",				327
+
+
+
+
+##------Left join------##
+		Two tables:
+				expensive_room: room with price above 200. col: item name,price,host_id,...
+				room_host:			contain all host info. col: host_id, host_name...
+
+		Target:
+				show item_name, price, host_name.
+
+		Logic:
+				1. Extract table:expensive_room from table:room_info
+				2. Merge needed columns from expensive_room and host_name
+
+		Code:
+
+		with expensive_room as
+		(
+		select `name` as 'item name', price, host_id
+		from room_info
+		where price > 200)
+		
+		select `item name`, price, room_host.host_name 
+		from expensive_room
+		left join room_host on expensive_room.host_id = room_host.host_id
+
+		Note: 以信息少的为准进行join.
+
+
+
+
+
+
+
+
+
+
+
+
+##------Union------##
+		The UNION operator is used to combine the [[[result-set]]] of two or more SELECT statements.
+
+		The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL
+
+		Example:
+		I want to show host_id of either the room price is above 100 or
+		the num of listing items is above 5
+
+		'''
+		select host_id from room_info
+		where price > 100
+		union
+		select host_id from room_host
+		where calculated_host_listings_count > 5
+		'''
 
 
 
@@ -139,6 +265,42 @@
 		
 		
 		
+		
+##------Not in------##
+		where price not in (100, 40)
+
+
+
+
+##------Between ... and------##
+
+		Select * from room_info
+		where price between 10 and 40
+
+
+		Another example:
+		Select * from tx_info
+		where block_time between '2020-01-04' and '2022-01-04'
+
+
+##------Not between ... and ------##
+
+
+##------Alias------##
+		Give column a name when showing result
+
+		Select `name` as 'room name' from room_info
+
+
+
+
+##------Having------##
+		Similar to <where>, while <where> does not work for aggregate function, e.g., <count()>
+
+		select count(id) as 'num of listing', host_id
+		from room_info
+		group by host_id
+		having count(id) > 2
 		
 
 

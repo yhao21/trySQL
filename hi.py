@@ -17,15 +17,19 @@ with open('/home/synferlo/mySQL/mydesktop_info.json', 'r') as f:
 host, user, password, database = info['host'], info['user'], info['password'], 'airbnb'
 
 df = pd.read_csv('/home/synferlo/my_disk/git/data/sample_dataset/airbnb_NYC_2019.csv')
+df = df.dropna()
+df['last_review'] = pd.to_datetime(df['last_review'])
+
 room_info = df[['id','name', 'host_id', 'room_type', 'price', 'minimum_nights', 'availability_365']]
 room_location = df[['id', 'neighbourhood_group', 'neighbourhood', 'latitude', 'longitude']]
-room_host = df[['host_id', 'host_name', 'calculated_host_listings_count']]
+room_host = df[['host_id', 'host_name', 'calculated_host_listings_count']].drop_duplicates().reset_index(drop = True)
 room_review = df[['id', 'number_of_reviews', 'last_review', 'reviews_per_month']]
 
 load_to_sql(room_info, host, user, password, database, 'room_info')
 load_to_sql(room_location, host, user, password, database, 'room_location')
 load_to_sql(room_host, host, user, password, database, 'room_host')
 load_to_sql(room_review, host, user, password, database, 'room_review')
+
 '''
 id x
 name x
