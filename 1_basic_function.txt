@@ -203,6 +203,32 @@
 
 
 
+
+
+
+
+##------Insert into select------##
+
+		Method 1:
+
+		Insert into <table2>
+		select * from <table1>
+		where condition.
+
+
+		Method 2:
+
+		Insert into table2 (col1, col2, ...)
+		select col1, col2, ...
+		from <table1>
+		where condition
+
+		This will insert qualified <table1> into <table2>
+
+		Note, data types in <table1> and <table2> should be the same.
+
+
+
 ===================================
 ###------Search action------###
 ===================================
@@ -302,6 +328,162 @@
 		group by host_id
 		having count(id) > 2
 		
+
+
+
+##------Any------##
+		select <columns> from <table>
+		where <column> <operator> any
+		(select <column> from <table> where <condition>)
+
+
+		Example: 
+				I want to show room with price greater than (new query)
+
+				select `name`, price, id
+				from room_info
+				where price > any 
+				(
+				select price*10 as new_price from room_info
+				)
+
+##------All------##
+		Same syntax as Any.
+
+
+
+
+
+
+##------Case------##
+		This the if...else in python. It will add a new column
+
+		UseCase 1:
+
+				select col1, col2, 
+				case
+						when <condition1> then <result1>
+						when <condition2> then <result2>
+						...
+						else <result n>
+						end as <new column>
+				from <table>
+
+
+						with cheap_room as (
+							select `name`, price, room_type from room_info
+						    where price < 100
+						)
+						
+						select 
+						*,
+						case
+							when price >= 80 then 'price is between 80 and 100'
+						    when price >= 50 and price < 80 then 'price is between 50 and 80'
+						    else 'price is below 50'
+						end as price_description
+						from cheap_room
+
+
+
+
+		UseCase 2:
+				select name, city, country
+				from customers
+				order by
+						(
+						case 
+								when city is null then country
+								else city
+						end
+						);
+
+
+
+##------ifnull------##
+		Solve for null value by assign it to another value.
+		Example
+				ifnull(referee_id, 0)
+
+		This will assign a zero to referee_id if it is null.
+
+		Practice Example:
+
+
+		========Begin========
+		Customer table:
+		+----+------+------------+
+		| id | name | referee_id |
+		+----+------+------------+
+		| 1  | Will | null       |
+		| 2  | Jane | null       |
+		| 3  | Alex | 2          |
+		| 4  | Bill | null       |
+		| 5  | Zack | 1          |
+		| 6  | Mark | 2          |
+		+----+------+------------+
+		
+		
+		id is the primary key column for this table.
+		Each row of this table indicates the id of a customer, their name, and the id of the customer who referred them.
+		
+		
+		Write an SQL query to report the names of the customer that are not referred by the customer with id = 2.
+		
+		Return the result table in any order.
+		
+		Code:
+				select
+				    name
+				from
+				    Customer
+				where
+				    ifnull(referee_id, 0) != 2
+
+		========End========
+
+
+
+
+================================
+###------Logic Function------###
+================================
+
+##------IF------##
+		if(condition, value_if_true, value_if_false)
+
+		This can swap values for a dummy variable.
+		Example
+				Salary 
+				+----+------+-----+--------+
+				| id | name | sex | salary |
+				+----+------+-----+--------+
+				| 1  | A    | m   | 2500   |
+				| 2  | B    | f   | 1500   |
+				| 3  | C    | m   | 5500   |
+				| 4  | D    | f   | 500    |
+				+----+------+-----+--------+
+				
+				
+		If I want to swap gender, i.e., swap m and f for each person,
+		I can use this
+
+		Code:
+				Update Salary set sex = if(sex = 'f', 'm', 'f')
+
+
+		Or I can use replace function to swap value:
+		
+		Code:
+				UPDATE salary SET sex = REPLACE ('fm', sex, '')
+
+
+
+
+
+
+
+
 
 
 
