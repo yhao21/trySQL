@@ -174,6 +174,69 @@
 
 
 
+##------self join------##
+
+		select <a.column> as x1, <b.column> as x2
+		from <table> a, <table> b
+		where <a.another_column> = <b.another_column>
+		
+		Self join is an SQL statement that is used to intersect or join a table in the database to itself
+		
+		
+		Given table:
+		Student
+		
+		CUID	name	age
+		 1	  adam  20
+		 2    Alex  20
+		 3    Chris 25
+		
+		
+		
+		If we want to find all possible cases for person with same age and return their names:
+		
+		Code:
+				select a.`name` as person1, b.`name` as person2
+				from student a, student b
+				where a.age = b.age
+		
+		Note, adam, Alex, and Chris has the same age as to themselves. In another word, we have
+		the first three cases:
+				adam	adam
+				Alex	Alex
+				Chris	Chris
+		
+		Then, adam and Alex has same age, the reverse is also true, i.e., Alex's age = adam's
+		age. Hence, we have another two cases:
+				adam	Alex
+				Alex	adam
+		
+		In total we have five qualified cases:
+				adam	adam
+				Alex	Alex
+				Chris	Chris
+				adam	Alex
+				Alex	adam
+		
+		If you only want to show a pair with different names
+		
+		Code:
+		
+				select a.`name` as person1, b.`name` as person2
+				from student a, student b
+				where 
+						a.age = b.age and a.CUID != b.CUID
+		
+		
+		
+		It returns this:
+		
+				adam	Alex
+				Alex	adam
+		
+		
+		
+		
 
 
 
