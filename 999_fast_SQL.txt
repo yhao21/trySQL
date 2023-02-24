@@ -33,3 +33,10 @@ This is FAST:
 
 
 
+###------Use between and ?------###
+Please write SQL statements to query the information of all courses which were opened in 2020 in the course tablecourses.
+
+Code:
+		select * from courses
+		where
+		    created_at like '2020%'

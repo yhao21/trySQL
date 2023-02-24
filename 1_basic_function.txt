@@ -89,7 +89,7 @@
 		inner join <table 2> on <table1.host_id> = <table2.host_id>
 
 
-		Example:
+		Example 1:
 
 		Suppose I want to include the host_id, from room_host,
 
@@ -99,6 +99,41 @@
 		from room_info
 		inner join room_host on room_info.host_id = room_host.host_id
 		'''
+
+
+
+		Example 2:
+
+
+		### rankings
+		
+		| id | category_id | year | rank | score |
+		| :- | :---------- | :--- | :--- | :---- |
+		| 1  | 1           | 2008 | 15   | 90    |
+		| 2  | 3           | 2012 | 11   | 98    |
+		| 3  | 2           | 2016 | 10   | 99    |
+		| 4  | 4           | 2017 | 40   | 72    |
+		
+		### categories
+		
+		| id |     name     |
+		| :- | :----------- |
+		| 1  | 'volleyball' |
+		| 2  | 'basketball' |
+		| 3  | 'soccer'     |
+		
+		
+		query the name of the item (name), the year of the competition (year) and the score (score) of all items in the rankings table and categories table
+		
+		
+
+
+
+
+
+
+
+
 
 
 
@@ -236,10 +271,42 @@
 		
 		
 		
-		
+	-------------------------------
+		If you want to show the information of a  person in the same age who has a larger CUID,
+		Code:
+				select a.*								a.* returns all columns of the qualified row(s)
+				from student a, student b
+				where a.age = b.age and a.CUID > b.CUID
+
+
+		Note, Alex's CUID is greater than adam's. Hence, the result would be 
+				Alex
 
 
 
+
+
+
+	-------------------------------
+	Another Example
+	-------------------------------
+
+
+id	distance
+1			8
+2			1
+3			4
+
+
+
+Please write a SQL statement to find the distance between the nearest two saplings (shortest_distance).
+
+		select min(abs(a.distance - b.distance)) as shortest_distance
+		from sapling_distances a, sapling_distances b
+		where a.id != b.id
+		having shortest_distance is not null
+
+		--因为用了聚和函数min，可能结果集会产生null值，所以最后要加having的筛选条件
 
 
 
@@ -292,6 +359,58 @@
 
 
 
+		从 tb_courses 表中查询所有的记录，并将其插入 tb_courses_new 表中。输入的 SQL 语句和执行结果如下所示。
+		INSERT INTO tb_courses_new
+				-> (course_id,course_name,course_grade,course_info)
+    -> SELECT course_id,course_name,course_grade,course_info
+    -> FROM tb_courses;
+
+
+
+
+
+##------Delete------##
+
+		
+		Method 1:
+						使用 DELETE 语句从单个表中删除数据，语法格式为：
+						DELETE FROM <表名> [WHERE 子句] [ORDER BY 子句] [LIMIT 子句]
+						注意：在不使用 WHERE 条件的时候，将删除所有数据。
+
+		Method 2: Delete all data
+						删除 tb_courses_new 表中的全部数据，输入的 SQL 语句和执行结果如下所示。
+						DELETE FROM tb_courses_new;
+
+		Method 3: 根据条件删除表中的数据
+						在 tb_courses_new 表中，删除 course_id 为 4 的记录
+						mysql> DELETE FROM tb_courses
+						    -> WHERE course_id=4;
+
+
+##------Truncate------##
+		It will delete all records in a table.
+
+
+		使用 TRUNCATE 语句清空 tb_student_course 表中的记录
+		mysql> TRUNCATE TABLE tb_student_course;
+
+
+##------Delete vs. Truncate------##
+		TRUNCATE 和 DELETE 的区别
+		从逻辑上说，TRUNCATE 语句与 DELETE 语句作用相同，但是在某些情况下，两者在使用上有所区别。
+		DELETE 是 DML 类型的语句；TRUNCATE 是 DDL 类型的语句。它们都用来清空表中的数据。
+		DELETE 是逐行一条一条删除记录的；TRUNCATE 则是直接删除原来的表，再重新创建一个一模一样的新表，而不是逐行删除表中的数据，执行数据比 DELETE 快。因此需要删除表中全部的数据行时，尽量使用 TRUNCATE 语句， 可以缩短执行时间。
+		DELETE 删除数据后，配合事件回滚可以找回数据；TRUNCATE 不支持事务的回滚，数据删除后无法找回。
+		DELETE 删除数据后，系统不会重新设置自增字段的计数器；TRUNCATE 清空表记录后，系统会重新设置自增字段的计数器。
+		DELETE 的使用范围更广，因为它可以通过 WHERE 子句指定条件来删除部分数据；而 TRUNCATE 不支持 WHERE 子句，只能删除整体。
+		DELETE 会返回删除数据的行数，但是 TRUNCATE 只会返回 0，没有任何意义。
+
+
+
+
+
+
+
 ===================================
 ###------Search action------###
 ===================================
@@ -304,6 +423,36 @@
 		'''
 
 		This will only return the first 5
+
+##------limit------##
+		LIMIT 初始位置，记录数
+		第一条记录的位置是 0，第二条记录的位置是 1。
+
+		price
+		149
+		225
+		89
+		80
+
+
+		Code:
+				select price from room_info limit 2, 2;
+
+		Result:
+				price
+				89
+				80
+
+
+
+
+##------offset------##
+		LIMIT 可以和 OFFSET 组合使用，语法格式如下：
+				LIMIT 记录数 OFFSET 初始位置
+
+		select price 
+
+
 
 ##------Min()------##
 		select min(<column name>) from <table name>
@@ -361,6 +510,27 @@
 
 
 
+##------Not------##
+query all teacher information in the teachers table except for Chinese (CN) teachers whose age is over 20 years old (excluding 20 years old)
+
+
+select * from teachers
+where not (country = 'CN' and age > 20)
+
+
+
+
+##------and------##
+		Select the information of all courses which named 'System Design' or 'Django' and the number of students student_count is more than 1000 from the courses table.
+		
+		Code:
+		
+				select * from courses
+				where
+				    (name = 'System Design' or name = 'Django' )
+				    and student_count > 1000
+
+
 ##------Between ... and------##
 
 		Select * from room_info
@@ -373,6 +543,8 @@
 
 
 ##------Not between ... and ------##
+		select * from teachers
+		where age not between 20 and 30
 
 
 ##------Alias------##
@@ -463,6 +635,398 @@
 
 
 
+
+
+
+
+================================
+###------Logic Function------###
+================================
+
+##------IF------##
+		if(condition, value_if_true, value_if_false)
+
+		This can swap values for a dummy variable.
+		Example
+				Salary 
+				+----+------+-----+--------+
+				| id | name | sex | salary |
+				+----+------+-----+--------+
+				| 1  | A    | m   | 2500   |
+				| 2  | B    | f   | 1500   |
+				| 3  | C    | m   | 5500   |
+				| 4  | D    | f   | 500    |
+				+----+------+-----+--------+
+				
+				
+		If I want to swap gender, i.e., swap m and f for each person,
+		I can use this
+
+		Code:
+				Update Salary set sex = if(sex = 'f', 'm', 'f')
+
+
+		Or I can use replace function to swap value:
+		
+		Code:
+				UPDATE salary SET sex = REPLACE ('fm', sex, '')
+
+
+
+
+
+
+
+================================
+###------String Functions------###
+================================
+##------concat------##
+		select concat('adam', 19) from student
+
+
+		It will return adam19
+
+
+##------concat_ws------##
+		This is similar to join in python
+		If you want to join strings with a specific string, use concat_ws
+		
+		select concat_ws(<symbol, expression1, expression2, ....>)
+
+		select concat_ws(' is ', 'adam', 16) from student
+
+		It will return 'adam is 16'.
+
+
+
+##------field------##
+		This is similar to list.inde(<item>) in python.
+		It will return the index position of a value.
+		For example, consider a price  list
+
+		price
+		124
+		2
+		15
+		10
+
+
+		select field(2, price) from room_info 
+
+
+		This will return
+		0
+		1
+		0
+		0
+
+		Note, the first item is indexed as 1, instead of 0.
+		Note, the above code is looking for 2 in the price list. It will consider 124 as one obj.
+
+
+##------format------##
+		The FORMAT() function formats a number to a format like "#,###,###.##", rounded to a specified number of decimal places, then it returns the result as a string.	
+		It is like str(round(i, n)) in python.
+
+
+		format(23452.1233, 2)
+
+		It will return 23452.12
+
+
+##------insert------##
+		It will replace a string by another string in a certain position.
+
+		insert(str1, position_of_str1, num_of_charactor_being_replaced, str2)
+
+		Code:
+
+				select insert('harry.com', 7, 2, 'no')
+
+		It will insert 'no' into the 7th charactor of 'harry.com' and replace the following 2 charactors. 
+		The 7th char in 'harry.com' is 'c'. So it will insert 'no' before 'c' (now 'n' is the 7th charactor).
+		Then remove the following two charactors, i.e., 'co'. Hence it will be
+
+				'harry.nom'
+
+
+		If I do
+				select insert('harry.com', 7, 3, 'no'),
+
+		I will got
+				'harry.no'
+
+
+
+##------instr------##
+		This is very useful. And it is similar to re.match()
+		It will return the position of the first occurance of the <pattern> in <str>
+
+		Note, <str> is not limited to string. It can also be a list of numbers
+
+		select instr(<str>, <pattern>) from <table>
+
+
+
+		Example:
+		Table: price
+		149
+		225
+		89
+
+
+		Code:
+				select instr(price, 2) as position, price from room_info
+
+
+		Result:
+				position			price
+				  0            149
+					1            225
+					0            89
+
+
+		For 225, it only return the position of the first '2'.
+
+
+
+
+
+##------locate------##
+		It will return the position of the first occurance of the <pattern> in <str>
+		Different with instr(), you can specify where to start using <where_to_start>.
+		instr() does not have this function.
+
+		locate(<pattern>, <str>, <where_to_start>)
+
+
+		
+		For the name column:
+								name
+		'Cozy Entire Floor of Brownstone'
+		'Large Cozy 1 BR Apartment In Midtown East'
+
+
+		Code:
+				select locate('Cozy', `name`) from room_info
+		Result
+
+				1		'Cozy Entire Floor of Brownstone'
+				7		'Large Cozy 1 BR Apartment In Midtown East'
+
+
+		Code:
+				select locate('Cozy', `name`, 2) from room_info
+		Result
+
+				0		'Cozy Entire Floor of Brownstone'
+				7		'Large Cozy 1 BR Apartment In Midtown East'
+
+
+		It is clear that if I start from the 2nd position, I will not find Cozy in the first row!
+
+		###I think locate is more useful.###
+
+
+
+
+
+
+##------lcase------##
+		convert a string to lower case
+##------lower------##
+		convert a string to lower case
+
+
+##------ucase------##
+		convert a string to upper case
+##------upper------##
+		convert a string to upper case
+
+
+##------left------##
+		extract <n> charactors from the left of a string/number/...
+
+		select left(<string>, number) from <table>
+
+
+
+		Code:
+				select left(price, 2) from room_info
+		Result:
+				14
+				22
+				89
+
+
+
+
+
+##------length------##
+		return the length of an obj. Same as len()
+
+
+
+
+
+
+
+================================
+###------Regexp------###
+================================
+
+^						匹配文本的开始字符							'^b' 			匹配以字母 b 开头的字符串						book、big、banana、bike
+$						匹配文本的结束字符							'st$' 		匹配以 st 结尾的字符串							test、resist、persist
+.						匹配任何单个字符								'b.t' 		匹配任何 b 和 t 之间有一个字符			bit、bat、but、bite
+*						匹配零个或多个在它前面的字符		'f*n' 		匹配字符 n 前面有任意个字符	f				fn、fan、faan、abcn
++						匹配前面的字符 1 次或多次				'ba+' 		匹配以 b 开头，后面至少紧跟一个 a		ba、bay、bare、battle
+<字符串>		匹配包含指定字符的文本					'fa' 			匹配包含‘fa’的文本									fan、afa、faad
+[字符集合]	匹配字符集合中的任何一个字符		'[xz]' 		匹配 x 或者 z												dizzy、zebra、x-ray、extra
+[^]					匹配不在括号中的任何字符				'[^abc]' 	匹配任何不包含 a、b 或 c 的字符串		desk、fox、f8ke
+字符串{n,}	匹配前面的字符串至少 n 次				'b{2}' 		匹配 2 个或更多的 b									bbb、bbbb、bbbbbbb
+字符串
+{n,m}	匹配前面的字符串至少 n 次，至多 m 次	'b{2,4}' 	匹配最少 2 个，最多 4 个 b					bbb、bbbb
+
+[a-z]			from a to z
+
+
+
+Example 1:
+
+		mysql> SELECT * FROM tb_students_info 
+		    -> WHERE name REGEXP '^J';
+
+
+
+##------[a-z]------##
+query the names of all courses whose first two letters are between'Db' and'Dy' in the course table courses
+
+Code:
+		select name from courses
+		where
+		    name regexp '^D[b-y]'
+
+
+
+
+
+
+
+
+
+================================
+###------Notice------###
+================================
+###------------###子查询语句可以嵌套在 SQL 语句中任何表达式出现的位置
+
+		Case1:
+				SELECT (子查询) FROM 表名; 子查询结果为单行单列，但不必指定列别名。
+
+		Case2:
+				SELECT * FROM (子查询) AS 表的别名; 必须为表指定别名。一般返回多行多列数据记录，可以当作一张临时表。
+
+		常见错误如下：
+		SELECT * FROM (SELECT * FROM result);
+		
+		这个子查询语句产生语法错误的原因在于主查询语句的 FROM 子句是一个子查询语句，因此应该为子查询结果集指定别名。正确代码如下。
+		SELECT * FROM (SELECT * FROM result) AS Temp;
+
+
+
+
+
+
+
+
+
+
+
+================================
+###------UPDATE多表关联更新------###
+================================
+
+
+一张表为 product 表, 另外一张表是 product_price 表。现要将 product_price 表中的价格字段 price 更新为 product 表中价格字段 price 的 80%。
+
+
+mysql> SELECT * FROM product;
++----+-----------+-----------------------+-------+----------+
+| id | productid | productname           | price | isdelete |
++----+-----------+-----------------------+-------+----------+
+|  1 |      1001 | C语言中文网Java教程   |   100 |        0 |
+|  2 |      1002 | C语言中文网MySQL教程  |   110 |        0 |
+|  3 |      1003 | C语言中文网Python教程 |   120 |        0 |
+|  4 |      1004 | C语言中文网C语言教程  |   150 |        0 |
+|  5 |      1005 | C语言中文网GoLang教程 |   160 |        0 |
++----+-----------+-----------------------+-------+----------+
+5 rows in set (0.02 sec)
+
+mysql> SELECT * FROM product_price;
++----+-----------+-------+
+| id | productid | price |
++----+-----------+-------+
+|  1 |      1001 |  NULL |
+|  2 |      1002 |  NULL |
+|  3 |      1003 |  NULL |
+|  4 |      1004 |  NULL |
+|  5 |      1005 |  NULL |
++----+-----------+-------+
+5 rows in set (0.01 sec)
+
+
+
+Method 1:
+		Code:
+
+				UPDATE product p, product_price pp SET pp.price = p.price * 0.8 WHERE p.productid= pp.productId;
+
+
+Method 2: inner join
+		Code:
+				UPDATE product p INNER JOIN product_price pp ON p.productid= pp.productid SET pp.price = p.price * 0.8;
+
+
+
+
+
+
+================================
+###------View------###
+================================
+##------Create a view------##
+		create view <view_name> as 
+		(select <columns> from <table>....)
+Code:
+		create view room_price as 
+		select `name`, price, room_type
+		from room_info
+		;
+		
+		
+
+##------modify view------##
+
+		ALTER VIEW view_students_info
+		    -> AS SELECT id,name,age
+		    -> FROM tb_students_info;
+
+
+
+
+
+
+
+
+
+================================
+###------NULL------###
+================================
+
+##------coalesce------##
+		The COALESCE() function returns the first non-null value in a list.
+
+
+
 ##------ifnull------##
 		Solve for null value by assign it to another value.
 		Example
@@ -508,44 +1072,44 @@
 
 
 
+
+##------isnull()------##
+		It will return 1 if it is null, 0 O.W.
+
+
+
+
+
 ================================
-###------Logic Function------###
+###------Math------###
 ================================
 
-##------IF------##
-		if(condition, value_if_true, value_if_false)
 
-		This can swap values for a dummy variable.
-		Example
-				Salary 
-				+----+------+-----+--------+
-				| id | name | sex | salary |
-				+----+------+-----+--------+
-				| 1  | A    | m   | 2500   |
-				| 2  | B    | f   | 1500   |
-				| 3  | C    | m   | 5500   |
-				| 4  | D    | f   | 500    |
-				+----+------+-----+--------+
-				
-				
-		If I want to swap gender, i.e., swap m and f for each person,
-		I can use this
-
-		Code:
-				Update Salary set sex = if(sex = 'f', 'm', 'f')
+##------max------##
+		select max(age) as max_age from teachers
+		where country = 'CN'
 
 
-		Or I can use replace function to swap value:
+
+##------power------##
+		square would be power(x,2).
+
+		Assuming that the table line_segments saves all groups consisting of three line segments with lengths a, b, c, please help Li Hua write a SQL statement to determine whether each group of line segments can form a right triangle
 		
+		
+				id	a		b		c
+				1		3		4		5
+				2		10  20	15
+				3		1		2		10
+				
 		Code:
-				UPDATE salary SET sex = REPLACE ('fm', sex, '')
-
-
-
-
-
-
-
+				select id,a,b,c,
+				case
+				    when power(a,2) + power(b,2) = power(c,2) then 'Yes'
+				    else 'No'
+				end as 'right_triangle'
+				from line_segments
+		
 
 
 

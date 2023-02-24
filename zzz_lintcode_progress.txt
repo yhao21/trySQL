@@ -1,0 +1,24 @@
+
+
+
+Finish	comparison operators
+Finish	Basic grammar
+Finish 	logical operators
+				arithmetic operators
+				group by
+				in
+				order by
+				as
+				having
+				select
+				distinct
+				like
+				limit
+				is null
+				union
+				constraints
+				ifnull/collapse
+				any
+				all
+				nested queries
+

@@ -1,0 +1,184 @@
+===============
+ Consecutive Empty Boxes
+===============
+
+		Example 1:
+		
+		Table content: boxes
+		
+		id	is_empty
+		1			1
+		2			0
+		3			1
+		4			1
+		5			1
+		After running your SQL statement, the table should return:
+		
+		id
+		3
+		4
+		5
+		
+		
+		
+		Example 2:
+		
+		Table content: boxes
+		
+		id	is_empty
+		1			 1
+		2			 0
+		3			 1
+		4			 1
+		5			 0
+		After running your SQL statement, the table should return:
+		
+		id
+		3
+		4
+		
+		
+		There are some boxes marked with ID in one place, some of which are filled with things and some of which are free.
+		Please write SQL statements, find empty and consecutive boxes, and return them in ascending order of id.
+		
+		Note: By saying consecutive, it refers to boxes near to each other are all empty, i.e.,
+		the above or the one below is empty.
+		
+		
+		Code:
+				select id from boxes
+				where is_empty = 1 and
+				(
+				    id+1 in (select id from boxes where is_empty = 1) -- the one below is empty
+				    or
+				    id-1 in (select id from boxes where is_empty = 1) --the above one is empty
+				)
+				order by id
+
+
+
+
+===============
+Find a Classmate with the Same Name
+===============
+						id	name
+						1		DaMing
+						2		Amy
+						3		HanMeimei
+						4		Amy
+						
+
+		Write a SQL query to find all students with the same name in the students table.
+		
+		
+		Code:
+				select name from students
+				group by name
+				having count(name) > 1
+		
+
+
+
+===============
+Members Whose Scores Exceed the Group leader
+===============
+
+		Given the group_members table, write a SQL query that can get the names of group members whose score exceeds their group leader (group_leader).
+		
+		
+		
+		Table content: group_members
+		
+		id	name		score			group_leader_id
+		1		Bryant		81						4
+		2		Iverson		860						1
+		3		Carter		851						null
+		4		McGrady		862						null
+		
+		In the above table, Bryant is the only group member whose score exceeds his group leader.
+		
+										name
+										Bryant
+		
+		
+		
+		Code:
+				select members.name
+				from group_members members left join group_members leader
+				on members.group_leader_id = leader.id
+				where members.score > leader.score
+
+
+
+===============
+The height of the second tallest player
+===============
+		Write a SQL query to get the second tallest height in the players (height)
+		
+		Table content: players
+		
+		id	height
+		1		 198
+		2		 226
+		3		 200
+		4		 226
+		For example, in the Table players above, the SQL query should return 200 as the second tallest height.
+		If there is no second tallest height, then the query should return null
+		
+		second_height
+		200
+		
+		
+		
+		Logic:
+		Find the maximum height in the group of players whose height is smaller than the maximum height.
+
+		Code:
+				select max(height) as second_height from players where
+				height < (select max(height) from players)
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+===============
+Search for course information for courses with more students than the number of students in all courses of the oldest teacher
+===============
+Write an SQL statement that queries the student count of courses taught by the oldest teacher from the teacher table teachers and the course table courses, and finally returns the information of courses in which the number of students exceeds all those courses of the teacher.
+
+
+Code:
+
+		select * from courses where
+		student_count > (
+		    select max(student_count) from courses where 
+		        teacher_id in (select id from teachers where age = (select max(age) from teachers))
+		)
+		
+
+
+
+
+
+
+
+
+
+
+
+
+===============
+
+===============
+
+
+
+
+
+
