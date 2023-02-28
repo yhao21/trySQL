@@ -1,0 +1,204 @@
+###------窗口函数格式------###
+
+		函数() over()
+
+		用over()指定函数执行的窗口范围。over包含partition by, order by , 和rows between三个句子。
+		
+		partition by: 	要分列的组
+		order by:				要排序的列
+		rows between: 	数据范围
+
+
+		若over中什么都不写，则窗口包含满足where的整张表（所有行）
+
+
+
+
+
+		###------rows between------###
+				Key words: 
+										preceding			前面的行row
+										current row		当前行
+										following			之后的行
+		
+										
+				[n] preceding 之前n行 
+				[unbounded] preceding 之前所有行
+				[n] following	之后n行
+				[unbounded] following	之后所有行
+		
+		
+		
+				Examples:
+						1. rows between 2 preceding and current row								当前行到前面两行（一共三行）
+						2. rows between unbounded preceding and current row   		当前行到之前所有行
+						3. rows between current row and unbounded following   		当前行到之后所有行
+						4. rows between 3 preceding and 1 following           		前面3行到之后一行
+		
+		
+		
+
+
+
+
+		##------Format 1------##
+				You can write the window function for each variable
+
+
+				Code:
+						select 
+							price,
+							sum(a.price) over(order by price rows between unbounded preceding and current row)
+						from (
+							select price, room_type, host_id from room_info
+							where host_id = 2787
+						) a
+						
+						
+						
+						
+		##------Format 2------##
+				Or you can define the window function at the bottom. This is useful when you want to 
+				implement it many times.
+
+
+				Code:
+						select 
+							price, 
+							sum(price) over w
+						from
+							(select price from room_info where host_id = 2787) a
+
+						window w as (order by price rows between unbounded preceding and current row)
+
+
+
+				Code:
+						SELECT
+						  time, subject, val,
+						  FIRST_VALUE(val)  OVER w AS 'first',
+						  LAST_VALUE(val)   OVER w AS 'last',
+						  NTH_VALUE(val, 2) OVER w AS 'second',
+						  NTH_VALUE(val, 4) OVER w AS 'fourth'
+						FROM observations
+						WINDOW w AS (PARTITION BY subject ORDER BY time ROWS UNBOUNDED PRECEDING);
+
+
+
+
+
+
+
+###------Types of window function------###
+
+		##------Aggregate function can be used as window function------##
+				sum()
+				count()
+				avg()
+				max()
+				min()
+
+
+				Name	Description
+				AVG()							Return the average value of the argument
+				BIT_AND()					Return bitwise AND
+				BIT_OR()					Return bitwise OR
+				BIT_XOR()					Return bitwise XOR
+				COUNT()						Return a count of the number of rows returned
+				COUNT(DISTINCT)		Return the count of a number of different values
+				GROUP_CONCAT()		Return a concatenated string
+				JSON_ARRAYAGG()		Return result set as a single JSON array
+				JSON_OBJECTAGG()	Return result set as a single JSON object
+				MAX()							Return the maximum value
+				MIN()							Return the minimum value
+				STD()							Return the population standard deviation
+				STDDEV()					Return the population standard deviation
+				STDDEV_POP()			Return the population standard deviation
+				STDDEV_SAMP()			Return the sample standard deviation
+				SUM()							Return the sum
+				VAR_POP()					Return the population standard variance
+				VAR_SAMP()				Return the sample variance
+				VARIANCE()				Return the population standard variance
+
+		##------window function------##
+				Name							Description																																Use case
+				CUME_DIST()				Cumulative distribution value
+				DENSE_RANK()			Rank of current row within its partition, without gaps										dense_rank() over w
+				FIRST_VALUE()			Value of argument from first row of window frame													first_value(price) over w
+				LAG()							Value of argument from row lagging current row within partition						lag(price) over w
+				LAST_VALUE()			Value of argument from last row of window frame														last_value(price) over w
+				LEAD()						Value of argument from row leading current row within partition						lead(price) over w
+				NTH_VALUE()				Value of argument from N-th row of window frame                 					nth_value(price, 4) over w   -- the 4th value
+				NTILE()						Bucket number of current row within its partition.              					
+				PERCENT_RANK()		Percentage rank value                                           					percent_rank() over w
+				RANK()						Rank of current row within its partition, with gaps             					rank() over w
+				ROW_NUMBER()			Number of current row within its partition                      					row_number() over w
+				
+
+
+
+
+
+
+
+
+###------Rank and dense_rank------###
+		Do not pass args within the parenthesis of rank() and dense_rank().
+
+		Code:
+		
+				select 
+					price,
+					dense_rank() over w as `dense_rank`,
+				  rank()		   over w as `rank`
+				from
+					(
+						select price from room_info where host_id = 2787
+				    ) a
+				
+				window w as (order by price)
+				
+		
+		
+		Result:
+				price			dense_rank 			rank
+				'49', 				'1', 				'1'
+				'79', 				'2', 				'2'
+				'79', 				'2', 				'2'
+				'99', 				'3', 				'4'
+				'149',				'4',				'5'
+				'149',				'4',				'5'
+		
+		
+		
+		Other Examples:
+				select 
+						price, dense_rank() over(order by price)
+				from 
+						(select price, room_type from room_info where host_id = 2787) a
+
+
+
+###------row_number()------###
+		Code:
+		
+				select 
+					a.price, 
+				    row_number() over w
+				from a
+				window w as (order by price)
+
+
+
+		Result:
+				price			row_number
+				'49', 		    1
+				'79', 		    2
+				'79', 		    3
+				'99', 		    4
+				'149',		    5
+				'149',		    6
+
+		
+
+

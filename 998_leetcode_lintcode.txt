@@ -174,8 +174,258 @@ Code:
 
 
 ===============
+The best sales
+===============
+lease write an SQL statement to query the sales id with the highest sales in the table sales table, and if there are multiple sales reaching the highest sales at the same time, sort by customer satisfaction and output the sales id with the highest customer satisfaction.
+
+Code:
+
+		select id from sales
+		order by sales_sum desc
+		limit 1
+
+
+
+
+
 
 ===============
+Search for information on courses and instructors with the highest number of students
+===============
+Write an SQL statement to join the teachers table and the courses table by using an inline view(INNER JOIN), and use the name of the course (alias course_name), the total number of students, and the name of the instructor (alias teacher_name) as the query table, and select the information with the highest number of students from this query table.
+
+Code:
+		select 
+		    courses.name as course_name, 
+		    student_count,
+		    teachers.name as teacher_name
+		from courses inner join teachers on
+		courses.teacher_id = teachers.id
+		where student_count = (select max(student_count) from courses)
+
+
+
+===============
+Check course information for courses with more students than Western Venom teachers
+===============
+Write an SQL statement to obtain the number of students in each course taught by the teacher Western Venom, then query the courses with student count more than any course of Western Venom taught and return the information of these courses.
+
+
+Code:
+
+		select * from courses
+		where
+		    student_count > all
+		    (select student_count from courses where
+		    teacher_id = (select id from teachers where name = 'Western Venom'))
+		
+
+
+
+===============
+Check the average age of teachers over 20 years old
+===============
+Write an SQL statement that queries the average age of teachers over 20 years old in the teachers table teachers, returning the field avg_teacher_age, with the result rounded to the nearest integer.
+
+Code:
+		select round(avg(age),0) as avg_teacher_age from teachers
+		 where age > 20
+
+
+
+
+
+
+===============
+Different orders
+===============
+
+
+
+
+Write an SQL statement to count the total number of students of courses offered by teachers from different country by linking the courses and teachers tables, and count the total number of students as 0 for teachers teach nothing.
+
+Finally, query the nationality of teachers whose nationality begins with 'U' and the total number of students (alias student_count) of all teachers of this nationality is between 2000 and 5000 (Include 2000 and 5000), then sort the results in descending order by the total number of students, or in ascending order by the teacher's nationality if the total number of students is the same.
+
+Code:
+		select country, sum(student_count) as student_count from
+		courses c inner join teachers t on
+		c.teacher_id = t.id
+		group by country
+		having student_count between 2000 and 5000
+		and country like 'U%'
+		order by student_count desc, country asc
+
+
+
+
+
+===============
+count student
+===============
+Write an SQL statement that join the courses and teachers tables to count the total number of students of courses offered by same teacher, and count the total number of students as 0 for teachers teach nothing.
+Finally, query the names of teachers and the total number of students (alias student_count) with total students fewer than 3000. Sort the results in ascending order by the total number of students or, if the total number of students were the same, by the teacher's name.
+
+
+Code:
+		select t.name, ifnull(sum(student_count), 0) as student_count from
+		courses c right join teachers t on
+		c.teacher_id = t.id
+		group by t.name
+		having student_count < 3000
+		order by student_count, t.name
+
+
+
+
+
+
+
+===============
+student count
+===============
+
+Write an SQL statement to query the course name name and the number of students student_count for the course with the most students taught by each teacher from the course table courses.
+
+
+Code:
+
+		select name, student_count from courses
+		where
+		    (teacher_id, student_count) in 
+		    (
+		        select teacher_id, max(student_count) from courses
+		        group by teacher_id
+		    )
+		
+		
+		
+		
+
+
+
+===============
+Group by two columns
+===============
+The shared_bicycles table stores the usage information of shared bicycles, including bicycle id (bike_id) and user id (user_id)
+Write a SQL statement to find the shared bicycle id and user id used by the same person at least three times
+
+Code:
+		select bike_id, user_id from shared_bicycles
+		group by user_id, bike_id
+		having count(bike_id) >= 3
+
+
+
+===============
+How to use select() as X returning the result. 
+===============
+The student_heights table records the height of the students, including many repeated heights
+Please write a SQL statement to find the tallest height in a height that has only appeared once
+
+
+Code:
+		select (
+		    select height from student_heights
+		    group by height
+		    having count(height) = 1
+		    order by height desc
+		    limit 1
+		)
+		as height
+
+
+
+
+===============
+Where condition in group by
+===============
+The exams records of students are stored in the exam table
+Please use SQL statement to find the student_id corresponding to the student with the largest number of failed subjects.
+
+
+Code:
+		select student_id from exams
+		where is_pass = 0		# we need to count the number of is_pass = 0, not others.
+		group by student_id
+		having count(is_pass) = (
+		    select count(is_pass) from exams
+		    where is_pass = 0
+		    group by student_id
+		    order by count(is_pass) desc limit 1
+		)
+
+
+
+
+
+===============
+
+===============
+The online_class_situations table shows the behavioral activities of some students in online classes.
+Each row of data records the number of courses (may be 0) that a student has listened to after logging in to the course with the same device on the same day before quitting the online course.
+Write a SQL statement to query the date each student The id of the device used to log in to the platform for the first time.
+
+Code:
+		select student_id, device_id from online_class_situations
+		where (student_id, `date`) in
+		(
+		    select student_id, min(date) from online_class_situations
+		    where course_number > 0
+		    group by student_id
+		)
+
+
+
+
+
+===============
+Delete elements
+===============
+
+Write a SQL statement to delete all duplicate names in the contacts table, and keep only the one with the smallest id among the duplicate names.
+
+
+Code:
+		delete from contacts
+		where id not in (
+		    select * from (select min(id) from contacts group by name) c
+		)
+
+
+Note, you cannot write like this
+
+
+		delete from contacts
+		where id not in (
+				select min(id) from contacts
+				group by name
+		)
+You can't specify target table 'contacts' for update in FROM clause
+
+
+
+
+
+===============
+Rank
+===============
+Write an SQL statement to get the height rank of the players table.
+If two players are the same height, then both players have the same height rank. There should be no interval between the ranks.
+
+
+Code:
+		--dense_rank() 窗口函数  将每个分区中的行排序
+		select 
+		height,
+		(DENSE_RANK() over(order by height desc)) as `Rank`
+		from players;
+		
+
+
+
+
+
 
 
 

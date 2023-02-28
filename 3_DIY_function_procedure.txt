@@ -1,0 +1,36 @@
+
+###------Create a procedure------###
+		存储过程的主体部分，也称为存储过程体，包含在过程调用的时候必须执行的 SQL 语句。这个部分以关键字 BEGIN 开始，以关键字 END 结束。若存储过程体中只有一条 SQL 语句，则可以省略 BEGIN-END 标志。
+		
+		在存储过程的创建中，经常会用到一个十分重要的 MySQL 命令，即 DELIMITER 命令，特别是对于通过命令行的方式来操作 MySQL 数据库的使用者，更是要学会使用该命令。
+		
+		在 MySQL 中，服务器处理 SQL 语句默认是以分号作为语句结束标志的。然而，在创建存储过程时，存储过程体可能包含有多条 SQL 语句，这些 SQL 语句如果仍以分号作为语句结束符，那么 MySQL 服务器在处理时会以遇到的第一条 SQL 语句结尾处的分号作为整个程序的结束符，而不再去处理存储过程体中后面的 SQL 语句，这样显然不行。
+		
+		为解决以上问题，通常使用 DELIMITER 命令将结束命令修改为其他字符。语法格式如下：
+		
+		
+		
+		
+		mysql> DELIMITER //
+		mysql> CREATE PROCEDURE ShowStuScore()
+		    -> BEGIN
+		    -> SELECT * FROM tb_students_score;
+		    -> END //
+
+
+		若希望换回默认的分号“;”作为结束标志，则在 MySQL 命令行客户端输入下列语句即可：
+		mysql > DELIMITER ;
+
+
+
+
+		例 2
+		创建名称为 GetScoreByStu 的存储过程，输入参数是学生姓名。存储过程的作用是通过输入的学生姓名从学生成绩信息表中查询指定学生的成绩信息，输入的 SQL 语句和执行过程如下所示。
+		mysql> DELIMITER //
+		mysql> CREATE PROCEDURE GetScoreByStu
+		    -> (IN name VARCHAR(30))
+		    -> BEGIN
+		    -> SELECT student_score FROM tb_students_score
+		    -> WHERE student_name=name;
+		    -> END //
+		Query OK, 0 rows affected (0.01 sec)

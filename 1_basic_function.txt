@@ -636,6 +636,56 @@ where not (country = 'CN' and age > 20)
 
 
 
+##------order by ------##
+
+
+		order by col1 [asc|desc], col2 [asc|desc], col3 [asc|desc], ...
+		
+		For example,
+				Code:
+						select age, grade from student
+						order by age asc, grade desc
+		
+		order by age first, if there are students whose age are same, then order by grade
+		
+		age			grade
+		15				80
+		16				90
+		16				85
+		16				80
+		
+		
+
+
+##------group by------##
+
+		select count(room_type) from room_info
+		gorup by room_type, ...
+		
+		
+		Note, you can count the number of room_type when your table is grouped by room_type.
+		It will return the num of obs under each room_type.
+
+
+
+		Note, you can group by MORE THAN on column.
+		Code:
+				select room_type, max(price) from room_info
+				group by room_type, host_id
+
+		This will return the maximum price for each room_type under each host_id.
+		Example:
+		Room type		max(price) 		host_id
+		A							100						1
+		B							150						1
+		A							100						2
+		B							200						2
+
+
+
+
+
+
 
 
 

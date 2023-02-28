@@ -4,9 +4,9 @@
 Finish	comparison operators
 Finish	Basic grammar
 Finish 	logical operators
-				arithmetic operators
-				group by
-				in
+Finish	arithmetic operators
+Finish	group by
+Finish	in
 				order by
 				as
 				having
